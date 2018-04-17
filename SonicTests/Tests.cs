@@ -91,6 +91,13 @@ namespace ExamTests
             var orderJson = JsonConvert.SerializeObject(order);
             
             Console.WriteLine(orderJson);
+
+            var orderDeserialzied = JsonConvert.DeserializeObject<Order>(orderJson);
+
+            Assert.IsTrue(orderDeserialzied.OrderItems[0].Item.Name == item1.Item.Name);
+            Assert.IsTrue(orderDeserialzied.OrderItems[0].Item.Price == item1.Item.Price);
+            Assert.IsTrue(orderDeserialzied.OrderItems[0].Quantity == item1.Quantity);
+
         }
 
         [TestMethod]
