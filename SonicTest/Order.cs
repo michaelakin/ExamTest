@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+
 
 namespace Exam
 {
@@ -13,14 +16,33 @@ namespace Exam
     /// is sent to other systems for processing that should not be able
     /// to change it in any way.
     /// </summary>
-    [Serializable()]
+    //[DataContract]
+    //[JsonObject(MemberSerialization.OptOut)]
+    [Serializable]
     public class Order
     {
+        [DataMember(Name = "OrderItems")]
         private readonly OrderItem[] orderItems;
+        //[DataMember]
+        public OrderItem[] OrderItems
+        {
+            get
+            {
+                // To make immutable, return a copy of the array.
+                OrderItem[] orderItemsCopy = new OrderItem[orderItems.Length];
+                Array.Copy(orderItems, orderItemsCopy, orderItems.Length);
+                return orderItemsCopy;
+            }
+        }
+
         public Order(OrderItem[] orderItems)
         {
             this.orderItems = orderItems;
         }
+
+        // Had to add this for serialzation to XML
+        private Order() { }
+
         // Returns the total order cost after the tax has been applied
         public float GetOrderTotal(float taxRate)
         {
@@ -43,10 +65,10 @@ namespace Exam
         */
         public ICollection<Item> GetItems()
         {
-            ICollection<Item> items = (ICollection<Item>)orderItems.ToList()
+            var items = orderItems.ToList()
                 .OrderBy(o => o.Item.GetName().ToLowerInvariant())
                 .Select(s => new Item(s.Item.GetKey(), s.Item.GetName(), s.Item.GetPrice()));
-            return items;
+            return (ICollection<Item>) items.ToArray();
         }
     }
 }

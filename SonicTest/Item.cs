@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace Exam
 {
@@ -14,18 +15,23 @@ namespace Exam
     /// change it in any way.
     ///
     /// </summary>;
-    [Serializable()]
+    //[DataContract]
     public class Item
     {
-        private int key;
-        private string name;
-        private float price;
+        //[DataMember(Name="key")]
+        private readonly int key;
+        //[DataMember(Name = "name")]
+        private readonly string name;
+        //[DataMember(Name = "price")]
+        private readonly float price;
         public Item(int key, string name, float price)
         {
             this.key = key;
             this.name = name;
             this.price = price;
         }
+
+        public int Key { get { return GetKey(); } }
         public int GetKey()
         {
             return key;
@@ -33,13 +39,15 @@ namespace Exam
 
         public string GetKeyForHashTable()
         {
-            return key.ToString();
+            return Key.ToString();
         }
 
+        public string Name { get { return GetName(); } }
         public string GetName()
         {
             return name;
         }
+        public float Price {  get { return GetPrice(); } }
         public float GetPrice()
         {
             return price;
