@@ -21,9 +21,10 @@ namespace Exam
     [Serializable]
     public class Order
     {
-        [DataMember(Name = "OrderItems")]
+        //[DataMember(Name = "OrderItems")]
         private readonly OrderItem[] orderItems;
-        //[DataMember]
+
+        [DataMember]
         public OrderItem[] OrderItems
         {
             get
@@ -33,6 +34,7 @@ namespace Exam
                 Array.Copy(orderItems, orderItemsCopy, orderItems.Length);
                 return orderItemsCopy;
             }
+            set { }
         }
 
         public Order(OrderItem[] orderItems)

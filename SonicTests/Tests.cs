@@ -88,16 +88,24 @@ namespace ExamTests
             var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02F), 4);
             OrderItem[] items = { item1, item2 };
             var order = new Order(items);
-            var orderJson = JsonConvert.SerializeObject(order);
+            var serializationSettings = new JsonSerializerSettings();
+            serializationSettings.TypeNameHandling = TypeNameHandling.Auto;
+
+            var orderJson = JsonConvert.SerializeObject(order,serializationSettings);
             
             Console.WriteLine(orderJson);
 
-            var orderDeserialzied = JsonConvert.DeserializeObject<Order>(orderJson);
-
-            Assert.IsTrue(orderDeserialzied.OrderItems[0].Item.Name == item1.Item.Name);
-            Assert.IsTrue(orderDeserialzied.OrderItems[0].Item.Price == item1.Item.Price);
-            Assert.IsTrue(orderDeserialzied.OrderItems[0].Quantity == item1.Quantity);
-
+            var orderDeserialized = JsonConvert.DeserializeObject<Order>(orderJson,serializationSettings);
+            Assert.IsTrue(orderDeserialized.OrderItems.Length > 0);
+            Assert.IsTrue(orderDeserialized.OrderItems[0] is ServiceOrderItem);
+            Assert.IsTrue(orderDeserialized.OrderItems[1] is MaterialOrderItem);
+            Assert.IsInstanceOfType(order.OrderItems[1], typeof(MaterialOrderItem));
+            Assert.IsTrue(orderDeserialized.OrderItems[1] is ITaxable);
+            Assert.IsTrue(orderDeserialized.OrderItems[0].IsTaxable == false);
+            Assert.IsTrue(orderDeserialized.OrderItems[1].IsTaxable == true);
+            Assert.IsTrue(orderDeserialized.OrderItems[0].Item.Name == item1.Item.Name);
+            Assert.IsTrue(orderDeserialized.OrderItems[0].Item.Price == item1.Item.Price);
+            Assert.IsTrue(orderDeserialized.OrderItems[0].Quantity == item1.Quantity);
         }
 
         [TestMethod]
@@ -114,8 +122,14 @@ namespace ExamTests
             var orderXml = writer.ToString();
             Console.WriteLine(orderXml);
 
+            TextReader reader = new StringReader(orderXml);
+            Order orderDeserialized = (Order) ser.Deserialize(reader);
+            Assert.IsTrue(orderDeserialized.OrderItems.Length > 0);
+            Assert.IsTrue(orderDeserialized.OrderItems[0].Item.Name == item1.Item.Name);
+            Assert.IsTrue(orderDeserialized.OrderItems[0].Item.Price == item1.Item.Price);
+            Assert.IsTrue(orderDeserialized.OrderItems[0].Quantity == item1.Quantity);
+            Assert.IsTrue(orderDeserialized.OrderItems[0].IsTaxable == false);
+            Assert.IsTrue(orderDeserialized.OrderItems[1].IsTaxable == true);
         }
-        
-
     }
 }
