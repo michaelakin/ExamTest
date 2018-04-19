@@ -90,8 +90,6 @@ namespace ExamTests
             //order.OrderItems = items;
             order.OrderItems[0] = items[1];
             Assert.AreNotEqual(order.OrderItems[0].Item.Name, order.OrderItems[1].Item.Name);
-
-
         }
 
         [TestMethod]
