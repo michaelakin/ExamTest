@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using Newtonsoft.Json;
 
 
@@ -16,15 +17,12 @@ namespace Exam
     /// is sent to other systems for processing that should not be able
     /// to change it in any way.
     /// </summary>
-    //[DataContract]
-    //[JsonObject(MemberSerialization.OptOut)]
-    [Serializable]
     public class Order
     {
-        //[DataMember(Name = "OrderItems")]
+
+        [XmlArrayItem(Type = typeof(ServiceOrderItem)),XmlArrayItem(Type = typeof(MaterialOrderItem))]
         private readonly OrderItem[] orderItems;
 
-        [DataMember]
         public OrderItem[] OrderItems
         {
             get
@@ -46,17 +44,21 @@ namespace Exam
         private Order() { }
 
         // Returns the total order cost after the tax has been applied
-        public float GetOrderTotal(float taxRate)
+        public decimal GetOrderTotal(decimal taxRate)
         {
-            float total = 0;
+            decimal total = 0;
             foreach (var orderitem in orderItems)
             {
                 if (orderitem is Interfaces.ITaxable)
-                    total += orderitem.Quantity * orderitem.Item.GetPrice() * taxRate;
+                {
+                    var netTotal = orderitem.Quantity * orderitem.Item.GetPrice();
+                    var totalWithTax = Math.Truncate((netTotal + (netTotal * taxRate) + 0.005m) * 100) / 100m;
+                    total += totalWithTax;
+                }
                 else
                     total += orderitem.Quantity * orderitem.Item.GetPrice();
             }
-            return (float)Math.Round((double)total, 2);
+            return total;
         }
 
         /**
@@ -70,7 +72,7 @@ namespace Exam
             var items = orderItems.ToList()
                 .OrderBy(o => o.Item.GetName().ToLowerInvariant())
                 .Select(s => new Item(s.Item.GetKey(), s.Item.GetName(), s.Item.GetPrice()));
-            return (ICollection<Item>) items.ToArray();
+            return (ICollection<Item>)items.ToArray();
         }
     }
 }

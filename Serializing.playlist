@@ -1,0 +1,1 @@
+<Playlist Version="1.0"><Add Test="ExamTests.SonicTests.SerializeOrderToJson" /><Add Test="ExamTests.SonicTests.SerializeOrderToXml" /></Playlist>

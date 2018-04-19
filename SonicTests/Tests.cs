@@ -16,14 +16,14 @@ namespace ExamTests
         [TestMethod]
         public void CreateServiceOrderItem()
         {
-            var item = new ServiceOrderItem(new Item(1, "One", 10.00F), 1);
+            var item = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
             Assert.IsNotNull(item);
         }
 
         [TestMethod]
         public void CreateMaterialOrderItem()
         {
-            var item = new MaterialOrderItem(new Item(2, "Two" , 10.02F), 1);
+            var item = new MaterialOrderItem(new Item(2, "Two" , 10.02m), 1);
             Assert.IsNotNull(item);
             Assert.IsTrue(item is ITaxable);
         }
@@ -31,17 +31,38 @@ namespace ExamTests
         [TestMethod]
         public void IsMaterialOrderItemTaxable()
         {
-            var item = new MaterialOrderItem(new Item(3, "Three", 10.03F), 1);
+            var item = new MaterialOrderItem(new Item(3, "Three", 10.03m), 1);
             Assert.IsTrue(item is ITaxable);
+        }
+
+        [TestMethod]
+        public void CalculateTotal()
+        {
+            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
+            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02m), 2);
+            OrderItem[] items = { item1, item2};
+            var order = new Order(items);
+            var total = order.GetOrderTotal(0.0825m);
+            Assert.IsTrue(total == 31.69m);
+        }
+
+        [TestMethod]
+        public void CalculateTotalSingleItem()
+        {
+            var item = new MaterialOrderItem(new Item(2, "Two", 2.00m), 1);
+            OrderItem[] items = { item };
+            var order = new Order(items);
+            var total = order.GetOrderTotal(0.0825m);
+            Assert.IsTrue(total == 2.17m);
         }
 
         [TestMethod]
         public void AreItemsSorted()
         {
-            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00F), 1);
-            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02F), 1);
-            var item3 = new MaterialOrderItem(new Item(3, "Three", 10.03F), 1);
-            var item4 = new MaterialOrderItem(new Item(4, "four", 10.04F), 2);
+            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
+            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02m), 1);
+            var item3 = new MaterialOrderItem(new Item(3, "Three", 10.03m), 1);
+            var item4 = new MaterialOrderItem(new Item(4, "four", 10.04m), 2);
 
             OrderItem[] items = { item1, item2, item3, item4 };
 
@@ -63,8 +84,8 @@ namespace ExamTests
         [TestMethod]
         public void IsOrderImmutable()
         {
-            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00F), 1);
-            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02F), 1);
+            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
+            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02m), 1);
             OrderItem[] items = { item1, item2 };
 
             var order = new Order(items);
@@ -84,16 +105,16 @@ namespace ExamTests
         [TestMethod]
         public void SerializeOrderToJson()
         {
-            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00F), 1);
-            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02F), 4);
+            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
+            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02m), 4);
             OrderItem[] items = { item1, item2 };
             var order = new Order(items);
             var serializationSettings = new JsonSerializerSettings();
             serializationSettings.TypeNameHandling = TypeNameHandling.Auto;
 
             var orderJson = JsonConvert.SerializeObject(order,serializationSettings);
-            
-            Console.WriteLine(orderJson);
+
+            Debug.WriteLine(orderJson);
 
             var orderDeserialized = JsonConvert.DeserializeObject<Order>(orderJson,serializationSettings);
             Assert.IsTrue(orderDeserialized.OrderItems.Length > 0);
@@ -101,8 +122,6 @@ namespace ExamTests
             Assert.IsTrue(orderDeserialized.OrderItems[1] is MaterialOrderItem);
             Assert.IsInstanceOfType(order.OrderItems[1], typeof(MaterialOrderItem));
             Assert.IsTrue(orderDeserialized.OrderItems[1] is ITaxable);
-            Assert.IsTrue(orderDeserialized.OrderItems[0].IsTaxable == false);
-            Assert.IsTrue(orderDeserialized.OrderItems[1].IsTaxable == true);
             Assert.IsTrue(orderDeserialized.OrderItems[0].Item.Name == item1.Item.Name);
             Assert.IsTrue(orderDeserialized.OrderItems[0].Item.Price == item1.Item.Price);
             Assert.IsTrue(orderDeserialized.OrderItems[0].Quantity == item1.Quantity);
@@ -111,16 +130,24 @@ namespace ExamTests
         [TestMethod]
         public void SerializeOrderToXml()
         {
-            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00F), 1);
-            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02F), 4);
+            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
+            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02m), 4);
+            //var item3 = new OrderItem(new Item(3, "three", 3), 3);
             OrderItem[] items = { item1, item2 };
             var order = new Order(items);
 
-            XmlSerializer ser = new XmlSerializer(typeof(Order));
+            XmlSerializer ser = new XmlSerializer(typeof(Order), 
+                new[] { typeof(Item),
+                    typeof(ServiceOrderItem),
+                    typeof(MaterialOrderItem)
+                    
+                });
+            //ser = new XmlSerializer(typeof(Order));
             TextWriter writer = new StringWriter();
             ser.Serialize(writer, order);
             var orderXml = writer.ToString();
-            Console.WriteLine(orderXml);
+
+            Debug.WriteLine(orderXml);
 
             TextReader reader = new StringReader(orderXml);
             Order orderDeserialized = (Order) ser.Deserialize(reader);
@@ -128,8 +155,14 @@ namespace ExamTests
             Assert.IsTrue(orderDeserialized.OrderItems[0].Item.Name == item1.Item.Name);
             Assert.IsTrue(orderDeserialized.OrderItems[0].Item.Price == item1.Item.Price);
             Assert.IsTrue(orderDeserialized.OrderItems[0].Quantity == item1.Quantity);
-            Assert.IsTrue(orderDeserialized.OrderItems[0].IsTaxable == false);
-            Assert.IsTrue(orderDeserialized.OrderItems[1].IsTaxable == true);
+            Assert.IsTrue(orderDeserialized.OrderItems[1] is ITaxable);
         }
-    }
+
+        [TestMethod]
+        public void OrderDataIsRequired()
+        {
+            Assert.ThrowsException<Exception>(() => { new OrderItem(null, 1); });
+            Assert.ThrowsException<Exception>(() => { new OrderItem(new Item(1,"1",1.0m), 0); });
+        }
+    } 
 }

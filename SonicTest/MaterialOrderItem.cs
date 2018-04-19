@@ -8,7 +8,7 @@ using Exam.Interfaces;
 
 namespace Exam
 {
-    [KnownType(typeof(MaterialOrderItem))]
+    //[KnownType(typeof(OrderItem))]
     public class MaterialOrderItem : OrderItem, ITaxable
     {
         public MaterialOrderItem(Item item, int quantity) : base(item, quantity)

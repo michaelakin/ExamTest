@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 namespace Exam
 {
@@ -15,20 +16,23 @@ namespace Exam
     /// change it in any way.
     ///
     /// </summary>;
-    //[DataContract]
     public class Item
     {
-        //[DataMember(Name="key")]
         private readonly int key;
-        //[DataMember(Name = "name")]
+
         private readonly string name;
-        //[DataMember(Name = "price")]
-        private readonly float price;
-        public Item(int key, string name, float price)
+
+        private readonly decimal price;
+        public Item(int key, string name, decimal price)
         {
             this.key = key;
             this.name = name;
             this.price = price;
+        }
+
+        // For XmlSerializer
+        private Item()
+        {
         }
 
         public int Key { get { return GetKey(); } }
@@ -47,10 +51,16 @@ namespace Exam
         {
             return name;
         }
-        public float Price {  get { return GetPrice(); } }
-        public float GetPrice()
+        public decimal Price {  get { return GetPrice(); } }
+        public decimal GetPrice()
         {
             return price;
+        }
+
+        // For the future requirement to use in a hash table.
+        public override string ToString()
+        {
+            return key.ToString() + name.ToString() + price.ToString();
         }
     }
 }
