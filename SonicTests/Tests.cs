@@ -1,12 +1,10 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Exam;
+﻿using Exam;
 using Exam.Interfaces;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using System.Diagnostics;
+using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
-using System.IO;
+using System.Diagnostics;
 
 namespace ExamTests
 {
@@ -23,7 +21,7 @@ namespace ExamTests
         [TestMethod]
         public void CreateMaterialOrderItem()
         {
-            var item = new MaterialOrderItem(new Item(2, "Two" , 10.02m), 1);
+            var item = new MaterialOrderItem(new Item(2, "Two", 10.02m), 1);
             Assert.IsNotNull(item);
             Assert.IsTrue(item is ITaxable);
         }
@@ -40,7 +38,7 @@ namespace ExamTests
         {
             var item1 = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
             var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02m), 2);
-            OrderItem[] items = { item1, item2};
+            OrderItem[] items = { item1, item2 };
             var order = new Order(items);
             var total = order.GetOrderTotal(0.0825m);
             Assert.IsTrue(total == 31.69m);
@@ -67,7 +65,7 @@ namespace ExamTests
             OrderItem[] items = { item1, item2, item3, item4 };
 
             var order = new Order(items);
-            var itemsList = (IList<Item>) order.GetItems();
+            var itemsList = (IList<Item>)order.GetItems();
             Assert.IsTrue(itemsList[0].GetName() == "four");
             Assert.IsTrue(itemsList[1].GetName() == "One");
             Assert.IsTrue(itemsList[2].GetName() == "Three");
@@ -112,11 +110,11 @@ namespace ExamTests
             var serializationSettings = new JsonSerializerSettings();
             serializationSettings.TypeNameHandling = TypeNameHandling.Auto;
 
-            var orderJson = JsonConvert.SerializeObject(order,serializationSettings);
+            var orderJson = JsonConvert.SerializeObject(order, serializationSettings);
 
             Debug.WriteLine(orderJson);
 
-            var orderDeserialized = JsonConvert.DeserializeObject<Order>(orderJson,serializationSettings);
+            var orderDeserialized = JsonConvert.DeserializeObject<Order>(orderJson, serializationSettings);
             Assert.IsTrue(orderDeserialized.OrderItems.Length > 0);
             Assert.IsTrue(orderDeserialized.OrderItems[0] is ServiceOrderItem);
             Assert.IsTrue(orderDeserialized.OrderItems[1] is MaterialOrderItem);
@@ -128,41 +126,10 @@ namespace ExamTests
         }
 
         [TestMethod]
-        public void SerializeOrderToXml()
-        {
-            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
-            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02m), 4);
-            //var item3 = new OrderItem(new Item(3, "three", 3), 3);
-            OrderItem[] items = { item1, item2 };
-            var order = new Order(items);
-
-            XmlSerializer ser = new XmlSerializer(typeof(Order), 
-                new[] { typeof(Item),
-                    typeof(ServiceOrderItem),
-                    typeof(MaterialOrderItem)
-                    
-                });
-            //ser = new XmlSerializer(typeof(Order));
-            TextWriter writer = new StringWriter();
-            ser.Serialize(writer, order);
-            var orderXml = writer.ToString();
-
-            Debug.WriteLine(orderXml);
-
-            TextReader reader = new StringReader(orderXml);
-            Order orderDeserialized = (Order) ser.Deserialize(reader);
-            Assert.IsTrue(orderDeserialized.OrderItems.Length > 0);
-            Assert.IsTrue(orderDeserialized.OrderItems[0].Item.Name == item1.Item.Name);
-            Assert.IsTrue(orderDeserialized.OrderItems[0].Item.Price == item1.Item.Price);
-            Assert.IsTrue(orderDeserialized.OrderItems[0].Quantity == item1.Quantity);
-            Assert.IsTrue(orderDeserialized.OrderItems[1] is ITaxable);
-        }
-
-        [TestMethod]
         public void OrderDataIsRequired()
         {
             Assert.ThrowsException<Exception>(() => { new OrderItem(null, 1); });
-            Assert.ThrowsException<Exception>(() => { new OrderItem(new Item(1,"1",1.0m), 0); });
+            Assert.ThrowsException<Exception>(() => { new OrderItem(new Item(1, "1", 1.0m), 0); });
         }
-    } 
+    }
 }

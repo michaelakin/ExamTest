@@ -2,11 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
-using Newtonsoft.Json;
-
 
 namespace Exam
 {
@@ -19,8 +14,6 @@ namespace Exam
     /// </summary>
     public class Order
     {
-
-        [XmlArrayItem(Type = typeof(ServiceOrderItem)),XmlArrayItem(Type = typeof(MaterialOrderItem))]
         private readonly OrderItem[] orderItems;
 
         public OrderItem[] OrderItems
@@ -40,23 +33,20 @@ namespace Exam
             this.orderItems = orderItems;
         }
 
-        // Had to add this for serialzation to XML
-        private Order() { }
-
         // Returns the total order cost after the tax has been applied
         public decimal GetOrderTotal(decimal taxRate)
         {
             decimal total = 0;
             foreach (var orderitem in orderItems)
             {
+                var netTotal = orderitem.Quantity * orderitem.Item.GetPrice();
                 if (orderitem is Interfaces.ITaxable)
                 {
-                    var netTotal = orderitem.Quantity * orderitem.Item.GetPrice();
                     var totalWithTax = Math.Truncate((netTotal + (netTotal * taxRate) + 0.005m) * 100) / 100m;
                     total += totalWithTax;
                 }
                 else
-                    total += orderitem.Quantity * orderitem.Item.GetPrice();
+                    total += netTotal;
             }
             return total;
         }

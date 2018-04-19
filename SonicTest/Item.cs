@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization;
-using System.Xml.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace Exam
 {
@@ -19,20 +13,14 @@ namespace Exam
     public class Item
     {
         private readonly int key;
-
         private readonly string name;
-
         private readonly decimal price;
+
         public Item(int key, string name, decimal price)
         {
             this.key = key;
             this.name = name;
             this.price = price;
-        }
-
-        // For XmlSerializer
-        private Item()
-        {
         }
 
         public int Key { get { return GetKey(); } }
@@ -41,17 +29,13 @@ namespace Exam
             return key;
         }
 
-        public string GetKeyForHashTable()
-        {
-            return Key.ToString();
-        }
-
         public string Name { get { return GetName(); } }
         public string GetName()
         {
             return name;
         }
-        public decimal Price {  get { return GetPrice(); } }
+
+        public decimal Price { get { return GetPrice(); } }
         public decimal GetPrice()
         {
             return price;
