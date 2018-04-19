@@ -74,12 +74,6 @@ namespace ExamTests
         }
 
         [TestMethod]
-        public void IsRounding()
-        {
-
-        }
-
-        [TestMethod]
         public void IsOrderImmutable()
         {
             var item1 = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
