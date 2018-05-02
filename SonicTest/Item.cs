@@ -46,6 +46,13 @@ namespace Exam
         {
             return key.ToString() + name.ToString() + price.ToString();
         }
+
+        // another way.
+        //public static implicit operator string(Item item)
+        //{
+        //    return item.key.ToString() + item.name.ToString() + item.price.ToString();
+        //}
+
     }
 }
 

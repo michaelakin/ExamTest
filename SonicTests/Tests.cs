@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Collections;
+using DeepCopy;
 
 namespace ExamTests
 {
@@ -36,6 +38,7 @@ namespace ExamTests
         [TestMethod]
         public void CalculateTotal()
         {
+            // http://www.softschools.com/math/topics/rounding_to_the_nearest_hundredth/
             var item1 = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
             var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02m), 2);
             OrderItem[] items = { item1, item2 };
@@ -70,7 +73,6 @@ namespace ExamTests
             Assert.IsTrue(itemsList[1].GetName() == "One");
             Assert.IsTrue(itemsList[2].GetName() == "Three");
             Assert.IsTrue(itemsList[3].GetName() == "Two");
-
         }
 
         [TestMethod]
@@ -123,5 +125,58 @@ namespace ExamTests
             Assert.ThrowsException<Exception>(() => { new OrderItem(null, 1); });
             Assert.ThrowsException<Exception>(() => { new OrderItem(new Item(1, "1", 1.0m), 0); });
         }
+
+        [TestMethod]
+        public void NewAddItemsToHashTable()
+        {
+            var item1 = new Item(1, "One", 10.00m);
+            var item2 = new Item(2, "Two", 10.02m);
+            var hash = new Hashtable();
+
+            hash.Add(item1.ToString(),item1);
+            hash.Add(item2.ToString(), item2);
+
+            Assert.IsTrue(hash.Contains("1One10.00"));
+            Assert.IsTrue(hash.Contains("2Two10.02"));
+        }
+
+        //[TestMethod]
+        //public void NewUnderstandRounding()
+        //{
+        //    var round1 = Math.Truncate((10.044m + 0.005m) * 100) / 100m;
+        //    var round2 = Math.Round(10.044m, 2, MidpointRounding.AwayFromZero);
+        //    Assert.AreEqual(round1, round2);
+
+        //    var round3 = Math.Truncate((10.045m + 0.005m) * 100) / 100m;
+        //    var round4 = Math.Round(10.045m, 2, MidpointRounding.AwayFromZero);
+        //    Assert.AreEqual(round3, round4);
+            
+        //    var round5 = Math.Round(10.044m, 2);
+        //    var round6 = Math.Round(10.045m, 2);
+        //    Assert.AreEqual(round1, round5);
+        //    Assert.AreEqual(round3, round6);
+        //}
+
+        [TestMethod]
+        public void NewDeepCopyTest()
+        {
+            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
+            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02m), 2);
+            OrderItem[] items = { item1, item2 };
+            var order = new Order(items);
+
+            var order2 = DeepCopier.Copy<Order>(order);
+
+            //unsafe
+            //{
+            //    Item* ptr1 = &order.OrderItems[1].Item;
+            //    Item* ptr2 = &order2.OrderItems[1].Item;
+
+            //    //Assert.AreNotEqual(ptr1,ptr2);
+            //}
+            Assert.AreEqual(order.OrderItems[1].Item.Name, order2.OrderItems[1].Item.Name);
+            
+        }
+
     }
 }

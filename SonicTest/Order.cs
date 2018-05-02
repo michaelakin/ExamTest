@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using DeepCopy;
 
 namespace Exam
 {
@@ -21,16 +22,14 @@ namespace Exam
             get
             {
                 // To make immutable, return a copy of the array.
-                OrderItem[] orderItemsCopy = new OrderItem[orderItems.Length];
-                Array.Copy(orderItems, orderItemsCopy, orderItems.Length);
-                return orderItemsCopy;
+                return DeepCopier.Copy<OrderItem[]>(orderItems);
             }
             set { }
         }
 
         public Order(OrderItem[] orderItems)
         {
-            this.orderItems = orderItems;
+             this.orderItems = DeepCopier.Copy<OrderItem[]>(orderItems);
         }
 
         // Returns the total order cost after the tax has been applied
@@ -42,7 +41,7 @@ namespace Exam
                 var netTotal = orderitem.Quantity * orderitem.Item.GetPrice();
                 if (orderitem is Interfaces.ITaxable)
                 {
-                    var totalWithTax = Math.Truncate((netTotal + (netTotal * taxRate) + 0.005m) * 100) / 100m;
+                    var totalWithTax = Math.Round(netTotal + (netTotal * taxRate), 2, MidpointRounding.AwayFromZero) ;
                     total += totalWithTax;
                 }
                 else
