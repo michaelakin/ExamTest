@@ -1,4 +1,5 @@
 ﻿using System;
+using Exam.Interfaces;
 
 namespace Exam
 {
@@ -7,6 +8,8 @@ namespace Exam
         public Item Item { get; set; }
 
         public int Quantity { get; }
+
+        public IOrderItemCalc orderItemCalc { get; set; }
 
         public OrderItem(Item item, int quantity)
         {

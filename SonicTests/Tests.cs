@@ -16,7 +16,7 @@ namespace ExamTests
         [TestMethod]
         public void CreateServiceOrderItem()
         {
-            var item = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
+            var item = new ServiceOrderItem(new Item(1, "One", 10.00m), 1, new ServiceOrderItemCalc());
             Assert.IsNotNull(item);
         }
 
@@ -39,21 +39,23 @@ namespace ExamTests
         public void CalculateTotal()
         {
             // http://www.softschools.com/math/topics/rounding_to_the_nearest_hundredth/
-            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00m), 1);
-            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02m), 2);
+            var item1 = new ServiceOrderItem(new Item(1, "One", 10.00m), 1, new ServiceOrderItemCalc());
+            var item2 = new MaterialOrderItem(new Item(2, "Two", 10.02m), 2, new MaterialOrderItemCalc());
             OrderItem[] items = { item1, item2 };
             var order = new Order(items);
-            var total = order.GetOrderTotal(0.0825m);
+            var orderCalculator = new OrderCalculator();
+            var total = order.GetOrderTotal(orderCalculator,0.0825m);
             Assert.IsTrue(total == 31.69m);
         }
 
         [TestMethod]
         public void CalculateTotalSingleItem()
         {
-            var item = new MaterialOrderItem(new Item(2, "Two", 2.00m), 1);
+            var item = new MaterialOrderItem(new Item(2, "Two", 2.00m), 1, new MaterialOrderItemCalc());
             OrderItem[] items = { item };
             var order = new Order(items);
-            var total = order.GetOrderTotal(0.0825m);
+            var orderCalculator = new OrderCalculator();
+            var total = order.GetOrderTotal(orderCalculator,0.0825m);
             Assert.IsTrue(total == 2.17m);
         }
 
@@ -175,7 +177,7 @@ namespace ExamTests
             //    //Assert.AreNotEqual(ptr1,ptr2);
             //}
             Assert.AreEqual(order.OrderItems[1].Item.Name, order2.OrderItems[1].Item.Name);
-            
+           
         }
 
     }

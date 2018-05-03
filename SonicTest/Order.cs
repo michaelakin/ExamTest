@@ -33,21 +33,26 @@ namespace Exam
         }
 
         // Returns the total order cost after the tax has been applied
-        public decimal GetOrderTotal(decimal taxRate)
+        public decimal GetOrderTotal(IOrderCalculator orderCalculator, decimal taxRate)
         {
-            decimal total = 0;
-            foreach (var orderitem in orderItems)
-            {
-                var netTotal = orderitem.Quantity * orderitem.Item.GetPrice();
-                if (orderitem is Interfaces.ITaxable)
-                {
-                    var totalWithTax = Math.Round(netTotal + (netTotal * taxRate), 2, MidpointRounding.AwayFromZero) ;
-                    total += totalWithTax;
-                }
-                else
-                    total += netTotal;
-            }
-            return total;
+            if (orderCalculator == null)
+                orderCalculator = new OrderCalculator();
+
+            return orderCalculator.CalculateTotal(this, taxRate);
+
+            //decimal total = 0;
+            //foreach (var orderitem in orderItems)
+            //{
+            //    var netTotal = orderitem.Quantity * orderitem.Item.GetPrice();
+            //    if (orderitem is Interfaces.ITaxable)
+            //    {
+            //        var totalWithTax = Math.Round(netTotal + (netTotal * taxRate), 2, MidpointRounding.AwayFromZero) ;
+            //        total += totalWithTax;
+            //    }
+            //    else
+            //        total += netTotal;
+            //}
+            //return total;
         }
 
         /**

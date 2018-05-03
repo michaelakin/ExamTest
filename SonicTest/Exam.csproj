@@ -7,8 +7,8 @@
     <ProjectGuid>{F5A31FA4-6BA3-4119-8201-9E998B829B12}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SonicTest</RootNamespace>
-    <AssemblyName>SonicTest</AssemblyName>
+    <RootNamespace>Exam</RootNamespace>
+    <AssemblyName>Exam</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -48,10 +48,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\IOrderItemCalc.cs" />
     <Compile Include="Interfaces\ITaxable.cs" />
+    <Compile Include="Interfaces\IOrderCalculator.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="MaterialOrderItem.cs" />
+    <Compile Include="ServiceOrderItemCalc.cs" />
+    <Compile Include="MaterialOrderItemCalc.cs" />
     <Compile Include="Order.cs" />
+    <Compile Include="OrderCalculator.cs" />
     <Compile Include="OrderItems.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceOrderItem.cs" />
